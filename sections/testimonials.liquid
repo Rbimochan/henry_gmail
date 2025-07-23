@@ -1,0 +1,197 @@
+{% comment %}
+  Testimonials section
+{% endcomment %}
+
+<section class="testimonials">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="section-heading">{{ section.settings.heading }}</h2>
+    {%- endif -%}
+
+    {%- if section.settings.subheading != blank -%}
+      <p class="section-subheading">{{ section.settings.subheading }}</p>
+    {%- endif -%}
+
+    <div class="testimonials-grid">
+      {%- for block in section.blocks -%}
+        <div class="testimonial-card">
+          {%- if block.settings.stars > 0 -%}
+            <div class="testimonial-stars">
+              {%- for i in (1..5) -%}
+                {%- if i <= block.settings.stars -%}
+                  <span class="star filled">★</span>
+                {%- else -%}
+                  <span class="star">☆</span>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+
+          {%- if block.settings.quote != blank -%}
+            <blockquote class="testimonial-quote">
+              "{{ block.settings.quote }}"
+            </blockquote>
+          {%- endif -%}
+
+          <div class="testimonial-author">
+            {%- if block.settings.author_image -%}
+              <img src="{{ block.settings.author_image | image_url: width: 60 }}" 
+                   alt="{{ block.settings.author_name | escape }}"
+                   class="testimonial-avatar"
+                   width="60"
+                   height="60">
+            {%- endif -%}
+            
+            <div class="testimonial-author-info">
+              {%- if block.settings.author_name != blank -%}
+                <h4 class="testimonial-author-name">{{ block.settings.author_name }}</h4>
+              {%- endif -%}
+              {%- if block.settings.author_title != blank -%}
+                <p class="testimonial-author-title">{{ block.settings.author_title }}</p>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+<style>
+  .testimonials {
+    padding: 60px 0;
+    background-color: #f8f8f8;
+  }
+  
+  .testimonials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+  }
+  
+  .testimonial-card {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  }
+  
+  .testimonial-stars {
+    margin-bottom: 20px;
+  }
+  
+  .star {
+    color: #ddd;
+    font-size: 1.2rem;
+  }
+  
+  .star.filled {
+    color: #ffd700;
+  }
+  
+  .testimonial-quote {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+  
+  .testimonial-author {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .testimonial-avatar {
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+  }
+  
+  .testimonial-author-name {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .testimonial-author-title {
+    color: #666;
+    font-size: 0.9rem;
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "tag": "section",
+  "class": "testimonials-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "What Our Customers Say"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote"
+        },
+        {
+          "type": "text",
+          "id": "author_name",
+          "label": "Author Name"
+        },
+        {
+          "type": "text",
+          "id": "author_title",
+          "label": "Author Title"
+        },
+        {
+          "type": "image_picker",
+          "id": "author_image",
+          "label": "Author Image"
+        },
+        {
+          "type": "range",
+          "id": "stars",
+          "label": "Star Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
+        }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [
+        {
+          "type": "testimonial",
+          "settings": {
+            "quote": "Amazing products and great customer service!",
+            "author_name": "John Doe",
+            "author_title": "Verified Customer",
+            "stars": 5
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
