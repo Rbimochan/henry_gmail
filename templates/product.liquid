@@ -1,0 +1,305 @@
+{% comment %}
+  Product template for individual shoe products
+{% endcomment %}
+
+<div class="section">
+  <div class="page-width">
+    <div class="product">
+      <div class="product__media-wrapper">
+        <div class="product__media">
+          {%- for media in product.media -%}
+            <div class="product__media-item" 
+                 {% if media.media_type == 'image' %}data-color="{{ media.alt | split: '_' | last }}"{% endif %}>
+              {%- if media.media_type == 'image' -%}
+                <img src="{{ media | image_url: width: 1000 }}" 
+                     alt="{{ media.alt | escape }}"
+                     loading="lazy"
+                     width="{{ media.width }}"
+                     height="{{ media.height }}">
+              {%- elsif media.media_type == 'video' -%}
+                {{ media | video_tag: autoplay: false, loop: false, controls: true }}
+              {%- endif -%}
+            </div>
+          {%- endfor -%}
+        </div>
+
+        {% comment %} Product badges {% endcomment %}
+        {%- if product.compare_at_price > product.price -%}
+          <div class="badge badge--sale">Sale</div>
+        {%- endif -%}
+        {%- if product.tags contains 'new' -%}
+          <div class="badge badge--new">New</div>
+        {%- endif -%}
+        {%- if product.tags contains 'bestseller' -%}
+          <div class="badge badge--bestseller">Bestseller</div>
+        {%- endif -%}
+      </div>
+
+      <div class="product__info">
+        <h1 class="product__title">{{ product.title }}</h1>
+        
+        <div class="product__price">
+          {%- if product.compare_at_price > product.price -%}
+            <span class="product__price--compare">${{ product.compare_at_price | money_without_currency }}</span>
+          {%- endif -%}
+          <span class="product__price--current">${{ product.price | money_without_currency }}</span>
+        </div>
+
+        {%- if product.description != blank -%}
+          <div class="product__description">
+            {{ product.description }}
+          </div>
+        {%- endif -%}
+
+        <form action="/cart/add" method="post" enctype="multipart/form-data" class="product-form">
+          {%- unless product.has_only_default_variant -%}
+            <div class="product-form__variants">
+              
+              {% comment %} Size selector {% endcomment %}
+              {%- for option in product.options_with_values -%}
+                {%- if option.name == 'Size' -%}
+                  <div class="product-form__option">
+                    <label class="product-form__option-label">{{ option.name }}</label>
+                    <div class="size-selector">
+                      {%- for value in option.values -%}
+                        <div class="size-option" data-size="{{ value }}">{{ value }}</div>
+                      {%- endfor -%}
+                    </div>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+
+              {% comment %} Color selector {% endcomment %}
+              {%- for option in product.options_with_values -%}
+                {%- if option.name == 'Color' -%}
+                  <div class="product-form__option">
+                    <label class="product-form__option-label">{{ option.name }}</label>
+                    <div class="color-swatches">
+                      {%- for value in option.values -%}
+                        {%- assign color_handle = value | handle -%}
+                        <div class="color-swatch" 
+                             style="background-color: {{ value | downcase }}" 
+                             data-color="{{ value }}"
+                             title="{{ value }}"></div>
+                      {%- endfor -%}
+                    </div>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+
+              <select name="id" class="product-form__variant-select visually-hidden">
+                {%- for variant in product.variants -%}
+                  <option value="{{ variant.id }}"
+                          {% unless variant.available %}disabled{% endunless %}>
+                    {{ variant.title }} - {{ variant.price | money }}
+                  </option>
+                {%- endfor -%}
+              </select>
+            </div>
+          {%- else -%}
+            <input type="hidden" name="id" value="{{ product.first_available_variant.id }}">
+          {%- endunless -%}
+
+          <div class="product-form__quantity">
+            <label for="quantity">Quantity</label>
+            <div class="quantity-selector">
+              <button type="button" class="quantity-btn quantity-minus">-</button>
+              <input type="number" 
+                     name="quantity" 
+                     id="quantity" 
+                     class="quantity-input" 
+                     value="1" 
+                     min="1">
+              <button type="button" class="quantity-btn quantity-plus">+</button>
+            </div>
+          </div>
+
+          <div class="product-form__buttons">
+            <button type="submit" 
+                    class="btn btn--primary add-to-cart-btn"
+                    data-product-id="{{ product.id }}"
+                    {% unless product.available %}disabled{% endunless %}>
+              {%- if product.available -%}
+                Add to Cart
+              {%- else -%}
+                Sold Out
+              {%- endif -%}
+            </button>
+          </div>
+        </form>
+
+        {% comment %} Product features specific to shoes {% endcomment %}
+        <div class="product__features">
+          <div class="product__feature">
+            <h4>Size Guide</h4>
+            <p>Find your perfect fit with our detailed size guide.</p>
+          </div>
+          <div class="product__feature">
+            <h4>Free Returns</h4>
+            <p>30-day free returns on all footwear purchases.</p>
+          </div>
+          <div class="product__feature">
+            <h4>Free Shipping</h4>
+            <p>Free shipping on orders over $75.</p>
+          </div>
+        </div>
+
+        {% comment %} Share buttons {% endcomment %}
+        <div class="product__share">
+          <h4>Share this product</h4>
+          <div class="share-buttons">
+            <a href="https://www.facebook.com/sharer/sharer.php?u={{ shop.url }}{{ product.url }}" 
+               target="_blank" 
+               class="share-btn share-btn--facebook">Facebook</a>
+            <a href="https://twitter.com/intent/tweet?url={{ shop.url }}{{ product.url }}&text={{ product.title }}" 
+               target="_blank" 
+               class="share-btn share-btn--twitter">Twitter</a>
+            <a href="https://pinterest.com/pin/create/button/?url={{ shop.url }}{{ product.url }}&media={{ product.featured_image | image_url: width: 1000 }}&description={{ product.title }}" 
+               target="_blank" 
+               class="share-btn share-btn--pinterest">Pinterest</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {% comment %} Related products section {% endcomment %}
+    {%- if collection.products.size > 1 -%}
+      <div class="related-products">
+        <h2>You might also like</h2>
+        <div class="collection-grid">
+          {%- for related_product in collection.products limit: 4 -%}
+            {%- unless related_product.id == product.id -%}
+              {% render 'product-card', product: related_product %}
+            {%- endunless -%}
+          {%- endfor -%}
+        </div>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  // Product page specific JavaScript
+  document.addEventListener('DOMContentLoaded', function() {
+    const productForm = document.querySelector('.product-form');
+    const variantSelect = document.querySelector('.product-form__variant-select');
+    const sizeOptions = document.querySelectorAll('.size-option');
+    const colorSwatches = document.querySelectorAll('.color-swatch');
+    const addToCartBtn = document.querySelector('.add-to-cart-btn');
+
+    // Update variant selection
+    function updateVariantSelection() {
+      const selectedSize = document.querySelector('.size-option.selected')?.dataset.size;
+      const selectedColor = document.querySelector('.color-swatch.selected')?.dataset.color;
+      
+      if (selectedSize && selectedColor) {
+        // Find matching variant
+        const variants = {{ product.variants | json }};
+        const matchingVariant = variants.find(variant => {
+          return variant.option1 === selectedSize && variant.option2 === selectedColor;
+        });
+
+        if (matchingVariant) {
+          variantSelect.value = matchingVariant.id;
+          addToCartBtn.dataset.variantId = matchingVariant.id;
+          
+          // Update price
+          const priceElement = document.querySelector('.product__price--current');
+          if (priceElement) {
+            priceElement.textContent = '$' + (matchingVariant.price / 100).toFixed(2);
+          }
+
+          // Update availability
+          if (matchingVariant.available) {
+            addToCartBtn.disabled = false;
+            addToCartBtn.textContent = 'Add to Cart';
+          } else {
+            addToCartBtn.disabled = true;
+            addToCartBtn.textContent = 'Sold Out';
+          }
+        }
+      }
+    }
+
+    // Size selection
+    sizeOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        sizeOptions.forEach(opt => opt.classList.remove('selected'));
+        this.classList.add('selected');
+        updateVariantSelection();
+      });
+    });
+
+    // Color selection
+    colorSwatches.forEach(swatch => {
+      swatch.addEventListener('click', function() {
+        colorSwatches.forEach(sw => sw.classList.remove('selected'));
+        this.classList.add('selected');
+        updateVariantSelection();
+      });
+    });
+
+    // Form submission
+    productForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const formData = new FormData(this);
+      const variantId = formData.get('id');
+      const quantity = formData.get('quantity');
+
+      if (!variantId) {
+        alert('Please select size and color');
+        return;
+      }
+
+      // Add to cart via AJAX
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: variantId,
+          quantity: parseInt(quantity)
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Show success message
+        window.shoeStoreTheme?.showNotification('Added to cart!', 'success');
+        window.shoeStoreTheme?.updateCartCount();
+        window.shoeStoreTheme?.animateCartIcon();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        window.shoeStoreTheme?.showNotification('Error adding to cart', 'error');
+      });
+    });
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Product",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "default": false,
+      "label": "Show vendor"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_share_buttons",
+      "default": true,
+      "label": "Show share buttons"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_related_products",
+      "default": true,
+      "label": "Show related products"
+    }
+  ]
+}
+{% endschema %}

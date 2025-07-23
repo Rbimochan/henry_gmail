@@ -1,0 +1,436 @@
+{% comment %}
+  Hero section for shoe store homepage
+{% endcomment %}
+
+<section class="hero" style="background-image: url('{{ section.settings.background_image | image_url: width: 1920 }}');">
+  <div class="hero__background">
+    {%- if section.settings.background_image -%}
+      <img src="{{ section.settings.background_image | image_url: width: 1920 }}" 
+           alt="{{ section.settings.heading | escape }}"
+           loading="lazy"
+           width="1920"
+           height="1080">
+    {%- endif -%}
+  </div>
+
+  <div class="page-width">
+    <div class="hero__content">
+      {%- if section.settings.heading != blank -%}
+        <h1 class="hero__title">{{ section.settings.heading }}</h1>
+      {%- endif -%}
+      
+      {%- if section.settings.subheading != blank -%}
+        <p class="hero__subtitle">{{ section.settings.subheading }}</p>
+      {%- endif -%}
+
+      {%- if section.settings.button_text != blank -%}
+        <div class="hero__buttons">
+          <a href="{{ section.settings.button_link }}" class="btn btn--primary hero__button">
+            {{ section.settings.button_text }}
+          </a>
+          
+          {%- if section.settings.secondary_button_text != blank -%}
+            <a href="{{ section.settings.secondary_button_link }}" class="btn btn--secondary hero__button">
+              {{ section.settings.secondary_button_text }}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.show_features -%}
+        <div class="hero__features">
+          <div class="hero__feature">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L2 7V10C2 16 6 20.5 12 22C18 20.5 22 16 22 10V7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Premium Quality</span>
+          </div>
+          <div class="hero__feature">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M20 6L9 17L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Free Returns</span>
+          </div>
+          <div class="hero__feature">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M1 3H5L7.68 14.39C7.77144 14.8504 8.02191 15.264 8.38755 15.5583C8.75318 15.8526 9.2107 16.009 9.68 16H19.4C19.8693 16.009 20.3268 15.8526 20.6925 15.5583C21.0581 15.264 21.3086 14.8504 21.4 14.39L23 6H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Free Shipping Over $75</span>
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  {%- if section.settings.show_scroll_indicator -%}
+    <div class="hero__scroll-indicator">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M7 13L12 18L17 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  {%- endif -%}
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: {{ section.settings.section_height }}vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: {{ section.settings.text_color }};
+    overflow: hidden;
+  }
+
+  .hero__background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -2;
+    {% if section.settings.background_image %}
+      background: none;
+    {% else %}
+      background: {{ section.settings.background_color }};
+    {% endif %}
+  }
+
+  .hero__background img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .hero__background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, {{ section.settings.overlay_opacity | divided_by: 100.0 }});
+    z-index: 1;
+  }
+
+  .hero__content {
+    position: relative;
+    z-index: 2;
+    max-width: 80rem;
+    padding: 0 2rem;
+    animation: fadeInUp 1s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .hero__title {
+    font-size: clamp(3rem, 8vw, {{ section.settings.heading_size }}rem);
+    font-weight: 700;
+    margin-bottom: 2rem;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    line-height: 1.1;
+  }
+
+  .hero__subtitle {
+    font-size: clamp(1.6rem, 4vw, {{ section.settings.subheading_size }}rem);
+    margin-bottom: 3rem;
+    opacity: 0.9;
+    font-weight: 400;
+    line-height: 1.4;
+    max-width: 60rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .hero__buttons {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 4rem;
+  }
+
+  .hero__button {
+    min-width: 18rem;
+    font-size: 1.6rem;
+    padding: 1.5rem 3rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .hero__button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .hero__features {
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+
+  .hero__feature {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1.4rem;
+    font-weight: 500;
+    opacity: 0.9;
+  }
+
+  .hero__feature svg {
+    flex-shrink: 0;
+  }
+
+  .hero__scroll-indicator {
+    position: absolute;
+    bottom: 3rem;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s infinite;
+    opacity: 0.7;
+  }
+
+  @keyframes bounce {
+    0%, 20%, 60%, 100% {
+      transform: translate(-50%, 0);
+    }
+    40% {
+      transform: translate(-50%, -10px);
+    }
+    80% {
+      transform: translate(-50%, -5px);
+    }
+  }
+
+  @media screen and (max-width: 768px) {
+    .hero {
+      min-height: {{ section.settings.mobile_height }}vh;
+      text-align: center;
+    }
+
+    .hero__features {
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .hero__buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hero__button {
+      width: 100%;
+      max-width: 30rem;
+    }
+  }
+
+  /* Parallax effect */
+  @media screen and (min-width: 768px) {
+    .hero.parallax .hero__background {
+      will-change: transform;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const hero = document.querySelector('.hero');
+    const heroBackground = hero?.querySelector('.hero__background');
+    
+    // Parallax effect
+    if ({{ section.settings.enable_parallax | json }} && hero && heroBackground && window.innerWidth > 768) {
+      hero.classList.add('parallax');
+      
+      function updateParallax() {
+        const scrolled = window.pageYOffset;
+        const rate = scrolled * -0.3;
+        heroBackground.style.transform = `translateY(${rate}px)`;
+      }
+
+      // Throttled scroll event
+      let ticking = false;
+      function requestTick() {
+        if (!ticking) {
+          requestAnimationFrame(updateParallax);
+          ticking = true;
+          setTimeout(() => { ticking = false; }, 16);
+        }
+      }
+
+      window.addEventListener('scroll', requestTick);
+    }
+
+    // Smooth scroll for scroll indicator
+    const scrollIndicator = document.querySelector('.hero__scroll-indicator');
+    if (scrollIndicator) {
+      scrollIndicator.addEventListener('click', function() {
+        const nextSection = hero.nextElementSibling;
+        if (nextSection) {
+          nextSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    }
+  });
+</script>
+
+{% schema %}
+{
+  "name": "Hero Section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Content"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Step Into Style",
+      "label": "Heading"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 3,
+      "max": 8,
+      "step": 0.5,
+      "default": 6,
+      "unit": "rem",
+      "label": "Heading size"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "default": "Discover our latest collection of premium footwear designed for comfort, style, and performance.",
+      "label": "Subheading"
+    },
+    {
+      "type": "range",
+      "id": "subheading_size",
+      "min": 1.4,
+      "max": 3,
+      "step": 0.2,
+      "default": 2.4,
+      "unit": "rem",
+      "label": "Subheading size"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "default": "Shop Now",
+      "label": "Primary button text"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "default": "/collections/all",
+      "label": "Primary button link"
+    },
+    {
+      "type": "text",
+      "id": "secondary_button_text",
+      "default": "View Collections",
+      "label": "Secondary button text"
+    },
+    {
+      "type": "url",
+      "id": "secondary_button_link",
+      "default": "/collections",
+      "label": "Secondary button link"
+    },
+    {
+      "type": "header",
+      "content": "Visual Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "default": "#667eea",
+      "label": "Background color",
+      "info": "Used when no background image is selected"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "default": "#ffffff",
+      "label": "Text color"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "default": 30,
+      "unit": "%",
+      "label": "Background overlay opacity"
+    },
+    {
+      "type": "range",
+      "id": "section_height",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "default": 80,
+      "unit": "vh",
+      "label": "Section height (desktop)"
+    },
+    {
+      "type": "range",
+      "id": "mobile_height",
+      "min": 40,
+      "max": 90,
+      "step": 5,
+      "default": 60,
+      "unit": "vh",
+      "label": "Section height (mobile)"
+    },
+    {
+      "type": "header",
+      "content": "Features"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_features",
+      "default": true,
+      "label": "Show feature highlights"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_scroll_indicator",
+      "default": true,
+      "label": "Show scroll indicator"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_parallax",
+      "default": false,
+      "label": "Enable parallax effect",
+      "info": "May affect page performance on some devices"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Section"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "test": "echo 'No automated tests for Shopify Liquid themes. Please use Shopify's Theme Preview or Theme Check for validation.'"
+  }
+}

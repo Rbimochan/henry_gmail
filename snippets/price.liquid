@@ -1,0 +1,77 @@
+{% comment %}
+  Price snippet for consistent price display across the theme
+{% endcomment %}
+
+{%- liquid
+  assign money_price = price | money
+  if settings.currency_code_enabled
+    assign money_price = price | money_with_currency
+  endif
+-%}
+
+<span class="price
+  {%- if price_class %} {{ price_class }}{% endif -%}
+  {%- if available == false %} price--sold-out {% endif -%}
+  {%- if compare_at_price > price %} price--on-sale {% endif -%}
+  {%- if product.price_varies == false and product.compare_at_price_varies %} price--no-compare{% endif -%}
+  {%- if show_badges %} price--show-badge{% endif -%}">
+
+  <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+  <span class="price-item price-item--regular">
+    {{ money_price }}
+  </span>
+  
+  {%- if compare_at_price > price -%}
+    <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
+    <span class="price-item price-item--sale">
+      {%- liquid
+        assign money_compare_price = compare_at_price | money
+        if settings.currency_code_enabled
+          assign money_compare_price = compare_at_price | money_with_currency
+        endif
+      -%}
+      {{ money_compare_price }}
+    </span>
+  {%- endif -%}
+  
+  {%- if show_badges -%}
+    <span class="price__badge-sale color-{{ settings.sale_badge_color_scheme }}">
+      <span class="visually-hidden">{{ 'products.product.on_sale' | t }}</span>
+      {%- liquid
+        assign savings = compare_at_price | minus: price
+        if settings.sale_badge_mode == 'percentage'
+          assign savings_percentage = savings | times: 100 | divided_by: compare_at_price
+          echo savings_percentage | round | append: '%'
+        else
+          if settings.currency_code_enabled
+            echo savings | money_with_currency
+          else
+            echo savings | money
+          endif
+        endif
+      -%}
+      {{ 'products.product.save_html' | t: saved_amount: savings }}
+    </span>
+    
+    {%- if available == false -%}
+      <span class="price__badge-sold-out color-{{ settings.sold_out_badge_color_scheme }}">
+        {{ 'products.product.sold_out' | t }}
+      </span>
+    {%- endif -%}
+  {%- endif -%}
+  
+  <small class="unit-price caption{% unless current_variant.unit_price_measurement %} hidden{% endunless %}">
+    <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+    <span class="price-item price-item--last">
+      <span>{{- current_variant.unit_price | money -}}</span>
+      <span aria-hidden="true">/</span>
+      <span class="visually-hidden">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+      <span>
+        {%- if current_variant.unit_price_measurement.reference_value != 1 -%}
+          {{- current_variant.unit_price_measurement.reference_value -}}
+        {%- endif -%}
+        {{ current_variant.unit_price_measurement.reference_unit }}
+      </span>
+    </span>
+  </small>
+</span>

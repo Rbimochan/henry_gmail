@@ -1,0 +1,256 @@
+{% comment %}
+  Size chart snippet for shoe products
+{% endcomment %}
+
+{%- liquid
+  assign size_chart_page = pages[settings.size_chart_page] | default: blank
+  assign show_size_chart = false
+  
+  if size_chart_page != blank or product.metafields.sizing.chart
+    assign show_size_chart = true
+  endif
+-%}
+
+{%- if show_size_chart -%}
+<div class="size-chart-wrapper">
+  <button type="button" class="size-chart-trigger link underlined-link" aria-expanded="false" aria-controls="size-chart-{{ product.id }}">
+    {% render 'icon', icon: 'size-guide' %}
+    {{ 'products.product.size_chart' | t }}
+  </button>
+  
+  <div id="size-chart-{{ product.id }}" class="size-chart modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal__dialog">
+      <div class="modal__content">
+        <div class="modal__header">
+          <h2 class="modal__title">{{ 'products.product.size_chart' | t }}</h2>
+          <button type="button" class="modal__close-button link" aria-label="{{ 'accessibility.close' | t }}">
+            {% render 'icon', icon: 'close' %}
+          </button>
+        </div>
+        
+        <div class="modal__body">
+          {%- if product.metafields.sizing.chart -%}
+            {%- liquid
+              assign chart_data = product.metafields.sizing.chart.value
+              assign chart_headers = chart_data.headers | default: 'US,UK,EU,CM' | split: ','
+              assign chart_rows = chart_data.rows | default: ''
+            -%}
+            
+            <div class="size-chart-table-wrapper">
+              <table class="size-chart-table table" role="table">
+                <thead>
+                  <tr>
+                    {%- for header in chart_headers -%}
+                      <th scope="col">{{ header | strip }}</th>
+                    {%- endfor -%}
+                  </tr>
+                </thead>
+                <tbody>
+                  {%- assign rows = chart_rows | split: '|' -%}
+                  {%- for row in rows -%}
+                    {%- unless row == blank -%}
+                      <tr>
+                        {%- assign cells = row | split: ',' -%}
+                        {%- for cell in cells -%}
+                          <td>{{ cell | strip }}</td>
+                        {%- endfor -%}
+                      </tr>
+                    {%- endunless -%}
+                  {%- endfor -%}
+                </tbody>
+              </table>
+            </div>
+            
+          {%- elsif size_chart_page -%}
+            <div class="size-chart-content rte">
+              {{ size_chart_page.content }}
+            </div>
+          {%- endif -%}
+          
+          <div class="size-chart-tips">
+            <h3>{{ 'products.product.sizing_tips' | t }}</h3>
+            <ul>
+              <li>{{ 'products.product.sizing_tip_1' | t }}</li>
+              <li>{{ 'products.product.sizing_tip_2' | t }}</li>
+              <li>{{ 'products.product.sizing_tip_3' | t }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal__overlay" aria-hidden="true"></div>
+  </div>
+</div>
+
+<style>
+  .size-chart-trigger {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.4rem;
+    margin-top: 1rem;
+  }
+  
+  .size-chart-trigger svg {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+  
+  .size-chart.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    display: none;
+  }
+  
+  .size-chart.modal[aria-hidden="false"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal__overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+  }
+  
+  .modal__dialog {
+    position: relative;
+    background: rgb(var(--color-background));
+    border-radius: var(--border-radius);
+    max-width: 80rem;
+    max-height: 80vh;
+    width: 90%;
+    overflow: hidden;
+    box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.1);
+  }
+  
+  .modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2rem;
+    border-bottom: 0.1rem solid rgba(var(--color-foreground), 0.1);
+  }
+  
+  .modal__title {
+    margin: 0;
+    font-size: 2rem;
+  }
+  
+  .modal__close-button {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+  }
+  
+  .modal__close-button svg {
+    width: 2rem;
+    height: 2rem;
+  }
+  
+  .modal__body {
+    padding: 2rem;
+    overflow-y: auto;
+    max-height: 60vh;
+  }
+  
+  .size-chart-table-wrapper {
+    overflow-x: auto;
+    margin-bottom: 2rem;
+  }
+  
+  .size-chart-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+  }
+  
+  .size-chart-table th,
+  .size-chart-table td {
+    padding: 1rem;
+    text-align: center;
+    border: 0.1rem solid rgba(var(--color-foreground), 0.1);
+  }
+  
+  .size-chart-table th {
+    background: rgba(var(--color-foreground), 0.05);
+    font-weight: var(--font-weight-bold);
+  }
+  
+  .size-chart-tips h3 {
+    margin-bottom: 1rem;
+    font-size: 1.6rem;
+  }
+  
+  .size-chart-tips ul {
+    margin: 0;
+    padding-left: 2rem;
+  }
+  
+  .size-chart-tips li {
+    margin-bottom: 0.5rem;
+  }
+  
+  @media screen and (max-width: 749px) {
+    .modal__dialog {
+      width: 95%;
+      max-height: 90vh;
+    }
+    
+    .modal__header,
+    .modal__body {
+      padding: 1.5rem;
+    }
+    
+    .size-chart-table th,
+    .size-chart-table td {
+      padding: 0.8rem 0.5rem;
+      font-size: 1.2rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const sizeChartTrigger = document.querySelector('.size-chart-trigger');
+    const sizeChartModal = document.querySelector('.size-chart.modal');
+    const modalOverlay = sizeChartModal?.querySelector('.modal__overlay');
+    const closeButton = sizeChartModal?.querySelector('.modal__close-button');
+    
+    function openModal() {
+      sizeChartModal.style.display = 'flex';
+      sizeChartModal.setAttribute('aria-hidden', 'false');
+      sizeChartTrigger.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeModal() {
+      sizeChartModal.style.display = 'none';
+      sizeChartModal.setAttribute('aria-hidden', 'true');
+      sizeChartTrigger.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+    }
+    
+    sizeChartTrigger?.addEventListener('click', openModal);
+    closeButton?.addEventListener('click', closeModal);
+    modalOverlay?.addEventListener('click', closeModal);
+    
+    // Close on escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && sizeChartModal.getAttribute('aria-hidden') === 'false') {
+        closeModal();
+      }
+    });
+  });
+</script>
+{%- endif -%}
